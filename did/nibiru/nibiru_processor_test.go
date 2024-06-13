@@ -20,6 +20,6 @@ func TestVerifySig(t *testing.T) {
 	assert.Nil(t, err)
 	ok := pub.VerifySignature(msg, sig)
 	fmt.Println(ok)
-	err = p.VerifySig("", 1, msg, sig, pub.Key)
+	err = p.VerifySig("did:nibiru:nibi176xaj2lk55nf9rqgw3528ad4nk2jxyjaxy4vw4", 1, msg, sig, pub.Key)
 	fmt.Println(err)
 }

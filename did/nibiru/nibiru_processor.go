@@ -26,6 +26,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/ontology-tech/ontlogin-sdk-go/modules"
 	types2 "github.com/ontology-tech/ontlogin-sdk-go/x/offchain/types"
+	"strings"
 )
 
 type NibiruProcessor struct {
@@ -40,23 +41,44 @@ func NewNibiruProcessor() (*NibiruProcessor, error) {
 }
 
 func (o *NibiruProcessor) VerifySig(did string, index int, msg []byte, sig []byte, pubkeybts []byte) error {
+	signerAddress, err := getNibiruAddressFromDID(did)
+	if err != nil {
+		return fmt.Errorf("getNibiruAddressFromDID,did:%s, fail: %s", did, err)
+	}
 	pub := secp256k1.PubKey{}
-	err := pub.UnmarshalAminoJSON(pubkeybts)
+	err = pub.UnmarshalAminoJSON(pubkeybts)
 	if err != nil {
 		return fmt.Errorf("unmarshal publicKey fail: %s", err)
 	}
 	builder := o.cfg.TxConfig.NewTxBuilder()
-	builder.SetSignatures(signing.SignatureV2{
+	err = builder.SetSignatures(signing.SignatureV2{
 		PubKey: &pub,
 		Data: &signing.SingleSignatureData{
 			SignMode:  signing.SignMode_SIGN_MODE_LEGACY_AMINO_JSON,
 			Signature: sig,
 		},
 	})
-	builder.SetMsgs(&types2.MsgSignData{Signer: "nibi176xaj2lk55nf9rqgw3528ad4nk2jxyjaxy4vw4", Data: []byte("hello")})
+	if err != nil {
+		return fmt.Errorf("SetSignatures failed:%s", err)
+	}
+	err = builder.SetMsgs(&types2.MsgSignData{Signer: signerAddress, Data: msg})
+	if err != nil {
+		return fmt.Errorf("SetMsgs failed:%s", err)
+	}
 	tx := builder.GetTx()
 	verifier := types2.NewVerifier(o.cfg.TxConfig.SignModeHandler())
 	return verifier.Verify(tx)
+}
+
+func getNibiruAddressFromDID(did string) (string, error) {
+	arr := strings.Split(did, ":")
+	if len(arr) != 3 {
+		return "", fmt.Errorf(modules.ERR_INVALID_DID_FORMAT)
+	}
+	if arr[1] != "nibiru" {
+		return "", fmt.Errorf(modules.ERR_NOT_ETH_DID)
+	}
+	return arr[2], nil
 }
 
 func (o *NibiruProcessor) VerifySigEIP712(did string, index int, msg []byte, sig []byte, pubkeyBytes []byte) error {
