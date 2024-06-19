@@ -33,11 +33,11 @@ type NibiruProcessor struct {
 	cfg params.EncodingConfig
 }
 
-func NewNibiruProcessor() (*NibiruProcessor, error) {
+func NewNibiruProcessor() *NibiruProcessor {
 	encConf := simapp.MakeTestEncodingConfig()
 	types2.RegisterInterfaces(encConf.InterfaceRegistry)
 	types2.RegisterLegacyAminoCodec(encConf.Amino)
-	return &NibiruProcessor{cfg: encConf}, nil
+	return &NibiruProcessor{cfg: encConf}
 }
 
 func (o *NibiruProcessor) VerifySig(did string, index int, msg []byte, sig []byte, pubkeybts []byte) error {
