@@ -9,7 +9,7 @@ import (
 )
 
 func TestVerifySig(t *testing.T) {
-	p, _ := NewNibiruProcessor()
+	p := NewNibiruProcessor()
 	msg := []byte("hello")
 	sig, err := base64.StdEncoding.DecodeString("S+S8iCVg1PLIYxSUxte5O5a7IL/cAxtQnaEeHXOlxIMOixJ7SiAYoeNM5cDaPxfe1AroMsK4LDBe0E8sIgUwew==")
 	assert.Nil(t, err)

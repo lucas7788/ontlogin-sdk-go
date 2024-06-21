@@ -20,9 +20,8 @@ package nibiru
 
 import (
 	"fmt"
+	"github.com/NibiruChain/nibiru/app"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	"github.com/cosmos/cosmos-sdk/simapp"
-	"github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/ontology-tech/ontlogin-sdk-go/modules"
 	types2 "github.com/ontology-tech/ontlogin-sdk-go/x/offchain/types"
@@ -30,11 +29,11 @@ import (
 )
 
 type NibiruProcessor struct {
-	cfg params.EncodingConfig
+	cfg app.EncodingConfig
 }
 
 func NewNibiruProcessor() *NibiruProcessor {
-	encConf := simapp.MakeTestEncodingConfig()
+	encConf := app.MakeEncodingConfig()
 	types2.RegisterInterfaces(encConf.InterfaceRegistry)
 	types2.RegisterLegacyAminoCodec(encConf.Amino)
 	return &NibiruProcessor{cfg: encConf}
